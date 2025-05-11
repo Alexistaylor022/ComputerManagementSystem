@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    // Use Maven to build your project
+                    sh 'mvn clean install'
+                }
+            }
+        }
+
+        stage('Unit and Integration Tests') {
+            steps {
+                script {
+                    // Run your unit and integration tests
+                    sh 'mvn test'
+                }
+            }
+        }
+
+        stage('Code Analysis') {
+            steps {
+                script {
+                    // Perform static code analysis (e.g., with SonarQube)
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                script {
+                    // Run a security scan using a tool like OWASP Dependency-Check
+                    sh 'dependency-check --project "My Project" --scan .'
+                }
+            }
+        }
+
+        stage('Deploy to Staging') {
+            steps {
+                script {
+                    // Deploy your application to a staging server (e.g., AWS)
+                    sh 'aws ec2 deploy --file target/my-app.war --region us-west-2'
+                }
+            }
+        }
+
+        stage('Integration Tests on Staging') {
+            steps {
+                script {
+                    // Run integration tests on the staging environment
+                    sh 'mvn verify'
+                }
+            }
+        }
+
+        stage('Deploy to Production') {
+            steps {
+                script {
+                    // Deploy to the production server
+                    sh 'aws ec2 deploy --file target/my-app.war --region us-east-1'
+                }
+            }
+        }
+    }
+}
